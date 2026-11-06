@@ -1,4 +1,25 @@
--- Table 1 of 6 (from CRM)
+/*
+===============================================================================
+Quality Checks
+===============================================================================
+Script Purpose:
+    This script performs quality checks for data consistency, accuracy,
+    and standardization across the 'silver' layer. It includes checks for:
+    - Null or duplicate primary keys.
+    - Unwanted spaces in string fields.
+    - Data standardization and consistency.
+    - Invalid date ranges and orders.
+    - Data consistency between related fields.
+
+Usage Notes:
+    - Run these checks after loading data to the Silver Layer.
+    - Investigate and resolve any discrepancies found during the checks.
+===============================================================================
+*/
+
+-- ====================================================================
+-- Checking 'silver.crm_cust_info' (Table 1 of 6)
+-- ====================================================================
 
 -- Check for Nulls or Duplicates in the Primary Key
 -- Expectation: No Result
@@ -26,7 +47,9 @@ FROM silver.crm_cust_info;
 SELECT DISTINCT cst_marital_status
 FROM silver.crm_cust_info
 
--- Table 2 of 6 (from CRM)
+-- ====================================================================
+-- Checking 'silver.crm_prd_info' (Table 2 of 6)
+-- ====================================================================
 
 -- Check for Nulls or Duplicates in Primary Key
 -- Expectation: No Result
@@ -69,7 +92,9 @@ SELECT
 FROM silver.crm_prd_info
 ORDER BY prd_id ASC
 
--- Table 3 of 6 (from CRM)
+-- ====================================================================
+-- Checking 'silver.crm_sales_details' (Table 3 of 6)
+-- ====================================================================
 
 -- Check for unwanted spaces
 -- Expectation: No results
@@ -140,9 +165,12 @@ ORDER BY sls_sales, sls_quantity, sls_price
 SELECT *
 FROM silver.crm_sales_details
 
--- Table 4 of 6 (from ERP)
+-- ====================================================================
+-- Checking 'silver.erp_cust_az12' (Table 4 of 6)
+-- ====================================================================
 
 -- Identify Out-of-Range Dates
+-- Expectation: Birthdates between 1924-01-01 and Today
 
 SELECT DISTINCT
 bdate
@@ -155,7 +183,9 @@ SELECT DISTINCT
 gen
 FROM silver.erp_cust_az12
 
--- Table 5 of 6 (from ERP)
+-- ====================================================================
+-- Checking 'silver.erp_loc_a101' (Table 5 of 6)
+-- ====================================================================
 
 -- Check primary key: If no duplicates
 -- Expectation: No results
@@ -186,11 +216,12 @@ END AS cntry
 FROM silver.erp_loc_a101
 
 -- Final check
-
 SELECT *
 FROM silver.erp_loc_a101
 
--- Table 6 of 6 (from ERP)
+-- ====================================================================
+-- Checking 'silver.erp_px_cat_g1v2' (Table 6 of 6)
+-- ====================================================================
 
 -- Primary Key: Check if match with cat_id in crm_prd_info
 -- Expectation: No results
