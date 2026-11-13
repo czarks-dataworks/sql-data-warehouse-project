@@ -59,12 +59,12 @@ BEGIN
 				WHEN UPPER(TRIM(cst_marital_status)) = 'S' THEN 'Single'
 				WHEN UPPER(TRIM(cst_marital_status)) = 'M' THEN 'Married'
 				ELSE 'n/a'
-			END cst_marital_status,	-- Normalize marital status to readable format
+			END cst_marital_status,		-- Normalize marital status to readable format
 			CASE
 				WHEN UPPER(TRIM(cst_gndr)) = 'F' THEN 'Female'
 				WHEN UPPER(TRIM(cst_gndr)) = 'M' THEN 'Male'
 				ELSE 'n/a'
-			END cst_gndr,			-- Normalize gender values to readable format
+			END cst_gndr,				-- Normalize gender values to readable format
 			cst_create_date
 		FROM (
 			SELECT
@@ -72,7 +72,7 @@ BEGIN
 			ROW_NUMBER() OVER (PARTITION BY cst_id ORDER BY cst_create_date DESC) AS flag_last
 			FROM bronze.crm_cust_info
 			WHERE cst_id IS NOT NULL
-		)t WHERE flag_last = 1;		-- Select the most recent record per customer
+		)t WHERE flag_last = 1;			-- Select the most recent record per customer
 
 		SET @end_time = GETDATE();
 		PRINT '>> Load Duration: ' + CAST (DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
@@ -107,14 +107,14 @@ BEGIN
 				WHEN 'R' THEN 'Road'
 				WHEN 'S' THEN 'Other Sales'
 				WHEN 'T' THEN 'Touring'
-				ELSE 'n/a'									-- Handled mssing values
+				ELSE 'n/a'									-- Handled missing values
 			END AS prd_line,								-- Map product line codes to descriptive values (data normalization)
 			CAST(prd_start_dt AS DATE) AS prd_start_dt,		-- Data type casting - converting data type
 			CASE
 				WHEN prd_start_dt > prd_end_dt
 				THEN CAST(LEAD(DATEADD(DAY, -1, prd_start_dt), 1) OVER (PARTITION BY prd_key ORDER BY prd_start_dt ASC) AS DATE)
 				ELSE CAST(prd_end_dt AS DATE)
-			END AS prd_end_dt				-- Data enrichment: Calculate end date as one day before the next start date
+			END AS prd_end_dt								-- Data enrichment: Calculate end date as one day before the next start date
 		FROM bronze.crm_prd_info;
 
 		SET @end_time = GETDATE();
@@ -159,13 +159,13 @@ BEGIN
 				WHEN sls_sales IS NULL OR sls_sales <= 0 OR sls_sales != sls_quantity * ABS(sls_price)
 				THEN sls_quantity * ABS(sls_price)
 				ELSE sls_sales
-			END AS sls_sales,	-- Recalculate sales if original value is missing or incorrect based on business rules from expert
+			END AS sls_sales,		-- Recalculate sales if original value is missing or incorrect based on business rules from expert
 			sls_quantity,
 			CASE
 				WHEN sls_price IS NULL OR sls_price <= 0
 				THEN sls_sales / NULLIF(sls_quantity, 0)
 				ELSE sls_price
-			END AS sls_price	-- Derive price if original value is invalid
+			END AS sls_price		-- Derive price if original value is invalid
 		FROM bronze.crm_sales_details;
 
 		SET @end_time = GETDATE();
@@ -196,12 +196,12 @@ BEGIN
 			CASE
 				WHEN bdate > GETDATE() THEN NULL
 				ELSE bdate
-			END AS bdate,	-- Set future birthdates to NULL
+			END AS bdate,												-- Set future birthdates to NULL
 			CASE
 				WHEN UPPER(TRIM(gen)) IN ('F', 'FEMALE') THEN 'Female'
 				WHEN UPPER(TRIM(gen)) IN ('M', 'MALE') THEN 'Male'
 			ELSE 'n/a'
-			END AS gen	-- Normalize gender values and handle unknown cases
+			END AS gen													-- Normalize gender values and handle unknown cases
 		FROM bronze.erp_cust_az12;
 
 		SET @end_time = GETDATE();
@@ -220,13 +220,13 @@ BEGIN
 			cntry
 		)
 		SELECT
-		REPLACE(cid, '-', '') AS cid,	-- Handled invalid values - Made cid consistent with column in other table.
+		REPLACE(cid, '-', '') AS cid,							-- Handled invalid values - Made cid consistent with column in other table.
 		CASE
-			WHEN TRIM(cntry) = 'DE' THEN 'Germany'			-- TRIM () - Removed unwanted spaces
+			WHEN TRIM(cntry) = 'DE' THEN 'Germany'				-- TRIM() - Removed unwanted spaces
 			WHEN TRIM(cntry) IN ('US', 'USA') THEN 'United States'
 			WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'n/a'	-- Handled missing values
 			ELSE TRIM(cntry)
-		END AS cntry	-- Normalize and handle missing or blank country codes
+		END AS cntry											-- Normalize and handle missing or blank country codes
 		FROM bronze.erp_loc_a101;
 
 		SET @end_time = GETDATE();
