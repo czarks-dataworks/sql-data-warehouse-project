@@ -34,6 +34,12 @@ The architecture follows the **Medallion pattern**. Data is extracted from **Cus
 
 ![Medallion architecture (high level): CRM and ERP CSV sources flow through Bronze (raw), Silver (cleaned), and Gold (star schema views) to BI, ad-hoc SQL queries, and ML for business users](docs/data_architecture.png)
 
+| Layer | Schema | Purpose | Transformations |
+|-------|--------|---------|-----------------|
+| **Bronze (Raw)** | `bronze` | Staging tables that mirror the source schemas, loaded with `BULK INSERT` (truncate and load) | None; original formats are preserved |
+| **Silver (Cleaned & Standardized)** | `silver` | Cleansed, transformed, and standardized data | Deduplication, trimming, data standardization, handling missing values, enforcing business rules |
+| **Gold (Analytical)** | `gold` | Business-ready star schema exposed as views, optimized for BI reporting | Joins across CRM and ERP, surrogate key generation, business logic |
+
 ### Data Flow and Integration
 
 The diagram below shows how source tables flow from Bronze to Gold and how CRM and ERP data are joined.
@@ -180,7 +186,7 @@ A major correction was made in the [silver layer stored procedure (table 6 of 6)
 
 ## 📜 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE). The original copyright notice from the source project is retained alongside mine.
 
 ## 👨‍💻 About Me
 
