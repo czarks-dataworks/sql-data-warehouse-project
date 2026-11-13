@@ -32,7 +32,7 @@ Develop a modern data warehouse using SQL Server to consolidate sales data, enab
 
 The architecture follows the **Medallion pattern**. Data is extracted from **Customer Relationship Management (CRM)** and **Enterprise Resource Planning (ERP)** systems as CSV files and moves through three layers:
 
-![Medallion architecture (high level): CRM and ERP CSV sources flow through Bronze (raw), Silver (cleaned), and Gold (star schema views) to BI, ad-hoc SQL queries, and ML for business users](docs/data_architecture.png)
+![Medallion architecture (high level): CRM and ERP CSV sources flow through Bronze (raw), Silver (cleaned), and Gold (star schema views) to BI, ad-hoc SQL queries, and ML for business users](docs/01_data_architecture.png)
 
 | Layer | Schema | Purpose | Transformations |
 |-------|--------|---------|-----------------|
@@ -44,7 +44,7 @@ The architecture follows the **Medallion pattern**. Data is extracted from **Cus
 
 The diagram below shows how source tables flow from Bronze to Gold and how CRM and ERP data are joined.
 
-![Data flow diagram: six CRM and ERP tables load one-to-one from Bronze to Silver, then combine into the Gold views fact_sales, dim_customers, and dim_products](docs/data_flow.png)
+![Data flow diagram: six CRM and ERP tables load one-to-one from Bronze to Silver, then combine into the Gold views fact_sales, dim_customers, and dim_products](docs/04_data_flow.png)
 
 ## 📂 Repository Structure
 
